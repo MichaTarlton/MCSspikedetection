@@ -34,7 +34,8 @@ spikeMatrix = zeros(length(time), 60);
 
 % Read data, filter, and apply event detection
 data_labels = h5read(filename, h5path, [1 1], [length(time) 60]);
-for i = 1:60
+%for i = 1:60
+for i = 1
     if i == 4
         index = find(strcmp('Ref', label));
     else
@@ -44,11 +45,13 @@ for i = 1:60
     data = data_labels(:,index);
     voltRaw = double(data)*conver*10^(double(exponent))*1e6;      % µV
     volt(:,i) = filter(Hd, voltRaw);
-    [ev, c, thresh, spikeRate] = EventDetector(rate, Nsig, volt(:,i), isNeg);
+    %[ev, c, thresh, spikeRate] = EventDetector(rate, Nsig, volt(:,i), isNeg);
+    isNeg = 0
+    [ev, c, thresh] = SpikeDetector(rate, Nsig, volt(:,i), isNeg);
     events{i} = ev;
     numEvents(i) = c;
     threshold(i) = thresh;
-    FR(i) = spikeRate;
+    %FR(i) = spikeRate;
 end
 
 %% Save
