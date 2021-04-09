@@ -9,7 +9,8 @@ elecNum = [12:17 21:28 31:38 41:48 51:58 61:68 71:78 82:87].';
 elecStr = string(elecNum);
 
 % File info
-fullfile = [loc, filename];
+%fullfile = [loc, filename];
+fullfile = [loc,'\', filename];
 [rate, durSec, label, exponent, conver, info] = h5fileinfo(fullfile);
 h5path = info.Groups.Groups(1).Groups(1).Groups(1).Name;
 h5path = [h5path, '/ChannelData'];
@@ -34,8 +35,10 @@ spikeMatrix = zeros(length(time), 60);
 
 % Read data, filter, and apply event detection
 data_labels = h5read(filename, h5path, [1 1], [length(time) 60]);
-%for i = 1:60
-for i = 1
+for i = 1:60
+%for i = 1
+    count = i
+
     if i == 4
         index = find(strcmp('Ref', label));
     else
@@ -45,8 +48,10 @@ for i = 1
     data = data_labels(:,index);
     voltRaw = double(data)*conver*10^(double(exponent))*1e6;      % µV
     volt(:,i) = filter(Hd, voltRaw);
+    
+
+    isNeg = 1;
     %[ev, c, thresh, spikeRate] = EventDetector(rate, Nsig, volt(:,i), isNeg);
-    isNeg = 0
     [ev, c, thresh] = SpikeDetector(rate, Nsig, volt(:,i), isNeg);
     events{i} = ev;
     numEvents(i) = c;
